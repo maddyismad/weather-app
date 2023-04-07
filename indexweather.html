@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Weather</title>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD"
+      crossorigin="anonymous"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Libre+Baskerville&family=Manrope:wght@200&family=Montserrat:wght@100;200;300&family=Playfair+Display&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      .container {
+        margin-top: 50px;
+        width: 60%;
+      }
+      h1 {
+        margin-left: 75px;
+        font-size: 70px;
+        font-family: "Playfair Display", serif;
+        margin-top: 25px;
+        margin-bottom: 15px;
+      }
+      h2 {
+        margin-left: 75px;
+        font-size: 65px;
+        font-family: "Playfair Display", serif;
+        display: inline;
+      }
+      .celsius {
+        font-size: 20px;
+        position: relative;
+        top: -30px;
+      }
+      .searchIput {
+        border-radius: 20px;
+      }
+      .btn2 {
+        border-radius: 30px;
+      }
+      .form-control {
+        border-radius: 30px;
+      }
+      .input-group {
+        width: 85%;
+        margin: 0 auto;
+        box-shadow: 5px 5px 20px rgb(169, 169, 170);
+        border-radius: 30px;
+      }
+      .card-body {
+        margin-top: 15px;
+      }
+      .card {
+        border-radius: 10px;
+        background: linear-gradient(
+          109.6deg,
+          rgb(223, 234, 247) 11.2%,
+          rgb(244, 248, 252) 91.1%
+        );
+      }
+      .weatherFour {
+        position: relative;
+        top: -97px;
+        color: rgb(143, 143, 156);
+        font-family: "Manrope", sans-serif;
+        font-weight: 500;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="card">
+        <div class="card-body">
+          <div class="input-group">
+            <div class="form-floating">
+              <input
+                type="text"
+                class="form-control"
+                id="floatingPassword"
+                placeholder="Enter a city..."
+              />
+              <label for="floatingPassword">Enter a city...</label>
+            </div>
+            <input
+              class="btn btn-info btn1"
+              type="submit"
+              value="Search"
+              id="search-btn"
+            />
+            <input
+              class="btn btn-primary btn2"
+              type="submit"
+              value="Current city"
+              id="current-button"
+            />
+          </div>
+          <h1 id="city-name"></h1>
+          <h2></h2>
+          <span class="celsius">°c</span>
+          <div class="container text-center weatherFour">
+            <div class="row row-cols-2">
+              <div class="col" id="date-time"></div>
+              <div class="col">Humidity: <span id="Humidity">47</span>%</div>
+              <div class="col" id="weather">Clouds</div>
+              <div class="col">Wind: <span id="wind">8</span>km/h</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      let now = new Date();
+      let hour = now.getHours();
+      let minutes = now.getMinutes();
+      let day = now.getDay();
+      let days = [
+        "Sunday",
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+      ];
+      let today = days[day];
+      if (hour < 10) {
+        hour = `0${hour}`;
+      }
+      if (minutes < 10) {
+        minutes = `0${minutes}`;
+      }
+      let date = document.querySelector("#date-time");
+      date.innerHTML = ` ${today} ${hour}:${minutes}`;
+      function showTemp(response) {
+        console.log(response.data);
+        let temp = document.querySelector("h2");
+        temp.innerHTML = Math.round(response.data.main.temp);
+        let wind = document.querySelector("#wind");
+        wind.innerHTML = Math.round(response.data.wind.speed);
+        let Humidity = document.querySelector("#Humidity");
+        Humidity.innerHTML = Math.round(response.data.main.humidity);
+        let weather = document.querySelector("#weather");
+        weather.innerHTML = response.data.weather[0].main;
+        let city = document.querySelector("#floatingPassword");
+        let cityName = response.data.name;
+        let h1 = document.querySelector("h1");
+        h1.innerHTML = cityName;
+      }
+      function showCity() {
+        let city = document.querySelector("#floatingPassword");
+        let cityName = city.value;
+        let h1 = document.querySelector("h1");
+        h1.innerHTML = cityName;
+        let apiKey = "b9ba0314a93083136d968577c718e31d";
+        let apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${apiKey}&units=metric`;
+        axios.get(apiUrl).then(showTemp);
+      }
+
+      function showCurrentCity(position) {
+        console.log(position.coords.latitude);
+        console.log(position.coords.longitude);
+        console.log(position);
+        let lon = position.coords.longitude;
+        let lat = position.coords.latitude;
+
+        let apiKey = "b9ba0314a93083136d968577c718e31d";
+        let apiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`;
+        axios.get(apiUrl).then(showTemp);
+      }
+
+      function handleLocation(event) {
+        event.preventDefault();
+        navigator.geolocation.getCurrentPosition(showCurrentCity);
+      }
+      navigator.geolocation.getCurrentPosition(showCurrentCity);
+      let searchButton = document.querySelector("#search-btn");
+      searchButton.addEventListener("click", showCity);
+      let currentButton = document.querySelector("#current-button");
+      currentButton.addEventListener("click", handleLocation);
+    </script>
+  </body>
+</html>
