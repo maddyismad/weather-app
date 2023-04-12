@@ -179,6 +179,13 @@
         event.preventDefault();
         navigator.geolocation.getCurrentPosition(showCurrentCity);
       }
+      let input = document.getElementById("floatingPassword");
+      input.addEventListener("keyup", function (event) {
+        if (event.keyCode === 13) {
+          event.preventDefault();
+          document.getElementById("search-btn").click();
+        }
+      });
       navigator.geolocation.getCurrentPosition(showCurrentCity);
       let searchButton = document.querySelector("#search-btn");
       searchButton.addEventListener("click", showCity);
